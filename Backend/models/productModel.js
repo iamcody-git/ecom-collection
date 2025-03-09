@@ -23,7 +23,7 @@ const productSchema = new mongoose.Schema({
     },
     subCategory:{
         type:String,
-        required :[true, 'suncategory filed is required']
+        required :[true, 'subcategory filed is required']
     },
     sizes:{
         type:Array,

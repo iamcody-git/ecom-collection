@@ -7,15 +7,27 @@ import userRouter from "./routes/userRoute.js";
 import productRouter from "./routes/productRoute.js";
 
 // app config
-
 const app = express();
 const port = process.env.Port || 4000;
+
 connectDB();
 connectCloudinary();
 
 // middleware
 app.use(express.json());
-app.use(cors());
+
+// Proper CORS setup
+app.use(
+  cors({
+    origin: "http://localhost:5174", // Your frontend URL
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true, // Allow cookies or tokens if needed
+  })
+);
+
+// Handle preflight requests
+app.options("*", cors());
 
 // api endpoints
 app.use('/api/user', userRouter);
