@@ -24,11 +24,10 @@ const List = ({ token }) => {
   const removeProduct = async (id) => {
     try {
       const response = await axios.delete(
-        backendUrl + "/api/product/remove",
-        { id },
+        `${backendUrl}/api/product/remove/${id}`, // Include the id in the URL path
         { headers: { token } }
       );
-
+  
       if (response.data.success) {
         toast.success(response.data.message);
         await fetchList(); // Refresh the list after deletion
@@ -36,11 +35,11 @@ const List = ({ token }) => {
         toast.error(response.data.message);
       }
     } catch (error) {
-      console.log(error);
-      // Use error.response to access the error message from the server
+      console.error("Error removing product:", error);
       toast.error(error.response?.data?.message || error.message);
     }
   };
+  
 
   useEffect(() => {
     fetchList();
