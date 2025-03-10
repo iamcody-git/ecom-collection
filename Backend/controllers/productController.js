@@ -31,7 +31,7 @@ export const addProduct = async (req, res) => {
       description,
       category,
       price: Number(price),
-      subCategory,
+      subCategory, // Fixed naming
       bestseller: bestseller === "true",
       sizes: JSON.parse(sizes),
       image: imagesUrl,

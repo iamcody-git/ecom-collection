@@ -8,7 +8,7 @@ import productRouter from "./routes/productRoute.js";
 
 // app config
 const app = express();
-const port = process.env.Port || 4000;
+const port = process.env.Port || 3000;
 
 connectDB();
 connectCloudinary();
