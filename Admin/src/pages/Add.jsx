@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { assets } from "../assets/assets";
 import axios from "axios";
 import { backendUrl } from "../App";
+import { toast } from "react-toastify";
 
 const Add = ({token}) => {
   const [image1, setImage1] = useState(false);
@@ -34,23 +35,33 @@ const Add = ({token}) => {
       image3 && formData.append("image3", image3);
       image4 && formData.append("image4", image4);
 
-      const response = await axios.post(
-        backendUrl + "/api/product/add",
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-            token: token,
-          },
-          withCredentials: true, // Add this if using credentials
-        }
-      );
+      const response = await axios.post("/api/product/add", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          token: token,
+        },
+      });
       
+      if (response.data.success) {
+        toast.success(response.data.message);
+        setName('')
+        setDescription('')
+        setImage1(false)
+        setImage2(false)
+        setImage3(false)
+        setImage4(false)
+        setPrice('')
+        setBestseller(false)
+        setSizes('')
+        
+      }else{
+        toast.error(response.data.message)
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error(error.message);
       
-      
-      
-      console.log(response.data);
-    } catch (error) {}
+    }
   };
 
   const toggleSize = (size) => {
@@ -188,8 +199,9 @@ const Add = ({token}) => {
         </label>
       </div>
       <button
+
         type="submit"
-        className="w-28 py-3 text-white bg-black rounded-lg"
+        className="w-28 py-3 text-white bg-black rounded-lg cursor-pointer hover:bg-amber-900"
       >
         ADD
       </button>

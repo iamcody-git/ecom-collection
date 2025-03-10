@@ -21,13 +21,13 @@ app.use(
   cors({
     origin: "http://localhost:5174", // Your frontend URL
     methods: ["GET", "POST", "PUT", "DELETE"],
-    allowedHeaders: ["Content-Type", "Authorization"],
+    allowedHeaders: ["Content-Type", "Authorization", "token"],
     credentials: true, // Allow cookies or tokens if needed
   })
 );
 
-// Handle preflight requests
-app.options("*", cors());
+
+
 
 // api endpoints
 app.use('/api/user', userRouter);
