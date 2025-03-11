@@ -9,8 +9,7 @@ const ShopContextProvider = (props) => {
   const currency = "Rs ";
   const delivery_fee = 100;
   const backendUrl =
-    import.meta.env.VITE_BACKEND_URL || "http://localhost:3000"; // Fallback URL
-  console.log("Backend URL:", backendUrl); // Debugging line
+    import.meta.env.VITE_BACKEND_URL || "http://localhost:3000"; 
 
   const [search, setSearch] = useState("");
   const [showSearch, setShowSearch] = useState(false);
@@ -38,6 +37,18 @@ const ShopContextProvider = (props) => {
       CartData[itemId][size] = 1;
     }
     setCartItem(CartData);
+
+    if (token) {
+      try {
+        await axios.post(backendUrl + '/api/cart/add', {itemId, size}, {headers:{token}})
+      } catch (error) {
+        console.log(error);
+        toast.error(error.message);
+        
+        
+      }
+      
+    }
   };
 
   const getCartCount = () => {
@@ -54,6 +65,15 @@ const ShopContextProvider = (props) => {
     let cartData = structuredClone(cartItem);
     cartData[itemId][size] = quantity;
     setCartItem(cartData);
+
+    if(token){
+      try {
+        await axios.post(backendUrl + '/api/cart/update',{itemId, size, quantity},{headers:{token}})
+      } catch (error) {
+        console.log(error);
+        toast.error(error.message);
+      }
+    }
   };
 
   const getCartAmount = () => {
@@ -88,9 +108,36 @@ const ShopContextProvider = (props) => {
     }
   };
 
+  const getUserCart = async (token) => {
+    try {
+      const response = await axios.post(
+        backendUrl + '/api/cart/get', 
+        {}, 
+        { headers: { token } }
+      );
+  
+      if (response.data.success) {
+        setCartItem(response.data.cartData);
+      } else {
+        toast.error("Failed to fetch cart data.");
+      }
+    } catch (error) {
+      console.log("Error fetching user cart:", error);
+      toast.error(error.message);
+    }
+  };
+  
+
   useEffect(() => {
     getProductData();
   }, []);
+
+  useEffect(()=>{
+    if(!token && localStorage.getItem('token')){
+      setToken(localStorage.getItem('token'));
+      getUserCart(localStorage.getItem('token'))
+    }
+  },[]);
 
   const value = {
     products,
