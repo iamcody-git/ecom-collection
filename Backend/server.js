@@ -19,7 +19,7 @@ app.use(express.json());
 // Proper CORS setup
 app.use(
   cors({
-    origin: "http://localhost:5174", // Your frontend URL
+    origin: ["http://localhost:5173", "http://localhost:5174"], // Your frontend URL
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization", "token"],
     credentials: true, // Allow cookies or tokens if needed
