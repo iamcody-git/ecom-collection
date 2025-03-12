@@ -2,16 +2,17 @@ import React, { useContext, useState } from "react";
 import { assets } from "../assets/assets";
 import { Link, NavLink } from "react-router-dom";
 import { ShopContext } from "../context/ShopContext";
+
 const Navbar = () => {
   const [visible, setVisible] = useState(false);
   const {
     setShowSearch,
-    getCartCount,
+    getCartCount,  
     navigate,
     setToken,
     token,
     setCartItems,
-  } = useContext(ShopContext);
+  } = useContext(ShopContext); 
 
   const logout = () => {
     navigate("/login");
@@ -23,27 +24,23 @@ const Navbar = () => {
   return (
     <div className="flex items-center justify-between py-5 font-medium">
       <Link to="/">
-        {" "}
         <img src={assets.logo2} alt="" className="w-24 h-20" />
       </Link>
       <ul className="hidden sm:flex gap-5 text-sm text-grey-700">
         <NavLink to="/" className="flex flex-col items-center gap-1">
           <p>Home</p>
-          <hr className="w-2/4 border-none h-[1.5px] bg-gray-700 hidden" />
         </NavLink>
 
         <NavLink to="/collection" className="flex flex-col items-center gap-1">
           <p>Collection</p>
-          <hr className="w-2/4 border-none h-[1.5px] bg-gray-700 hidden" />
         </NavLink>
 
         <NavLink to="/about" className="flex flex-col items-center gap-1">
           <p>About</p>
-          <hr className="w-2/4 border-none h-[1.5px] bg-gray-700 hidden" />
         </NavLink>
+
         <NavLink to="/contact" className="flex flex-col items-center gap-1">
           <p>Contact</p>
-          <hr className="w-2/4 border-none h-[1.5px] bg-gray-700 hidden" />
         </NavLink>
       </ul>
 
@@ -61,15 +58,12 @@ const Navbar = () => {
             src={assets.profile_icon}
             alt="Profile"
           />
-          {/* drop menu */}
           {token && (
             <div className="group-hover:block hidden absolute dropdown-menu right-0 pt-4">
               <div className="flex flex-col gap-2 w-36 py-3 px-5 bg-slate-100 text-gray-500 rounded shadow-lg">
                 <p className="cursor-pointer hover:text-black">My Profile</p>
-                <p onClick={()=>navigate('/orders')} className="cursor-pointer hover:text-black">Orders</p>
-                <p onClick={logout} className="cursor-pointer hover:text-black">
-                  Logout
-                </p>
+                <p onClick={() => navigate('/orders')} className="cursor-pointer hover:text-black">Orders</p>
+                <p onClick={logout} className="cursor-pointer hover:text-black">Logout</p>
               </div>
             </div>
           )}
@@ -88,10 +82,10 @@ const Navbar = () => {
           alt=""
         />
       </div>
-      {/* sidebar menu for small screen */}
+
       <div
         className={`fixed top-0 right-0 h-screen w-[70%] bg-white transition-transform duration-300 sm:hidden 
-  ${visible ? "translate-x-0" : "translate-x-full"}`}
+        ${visible ? "translate-x-0" : "translate-x-full"}`}
       >
         <div className="flex flex-col text-gray-600">
           <div
