@@ -19,7 +19,7 @@ const PlaceOrder = () => {
     delivery_fee,
     products,
     setCartItem,
-    setProducts, // Fixed incorrect setProduct usage
+    setProducts,
   } = useContext(ShopContext);
 
   const [formData, setFormData] = useState({
@@ -50,24 +50,19 @@ const PlaceOrder = () => {
     try {
       let orderItems = [];
 
-      for (const productId in cartItem) {
-        for (const size in cartItem[productId]) {
-          const itemQuantity = cartItem[productId][size];
-
-          if (itemQuantity > 0) {
-            const product = products.find((product) => product._id === productId);
-            if (product) {
-              const itemInfo = { ...product, quantity: itemQuantity, size };
-              orderItems.push(itemInfo);
+      for (const items in cartItem) {
+        for (const item in cartItem[items]) {
+          if (cartItem[items][item]) {
+            const iteminfo = structuredClone(
+              products.find((product) => product._id === items)
+            );
+            if (iteminfo) {
+              iteminfo.size = item;
+              iteminfo.quantity = cartItem[items][item];
+              orderItems.push(iteminfo);
             }
           }
         }
-      }
-
-      if (orderItems.length === 0) {
-        toast.error("No items in the cart!");
-        setLoading(false);
-        return;
       }
 
       let orderData = {
@@ -77,15 +72,28 @@ const PlaceOrder = () => {
         paymentMethod: method,
       };
 
-      const response = await axios.post(backendUrl + "/api/order/place", orderData, {
-        headers: { token },
-      });
+      switch (method) {
+        //api calls fro cod
+        case "cod":
+          const response = await axios.post(
+            backendUrl + "/api/order/place",
+            orderData,
+            { headers: { token } }
+          );
+          console.log(response.data);
+          
 
-      if (response.data.success) {
-        setCartItem({});
-        navigate("/orders");
-      } else {
-        toast.error(response.data.message);
+          if (response.data.success) {
+            setCartItem({});
+            navigate("/orders");
+          } else {
+            toast.error(response.data.message);
+          }
+
+          break;
+
+        default:
+          break;
       }
     } catch (error) {
       console.error("Error processing order:", error);
@@ -95,17 +103,6 @@ const PlaceOrder = () => {
     }
   };
 
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const response = await axios.get(backendUrl + "/api/products");
-        setProducts(response.data);
-      } catch (error) {
-        console.error("Error fetching products:", error);
-      }
-    };
-    fetchProducts();
-  }, [backendUrl, setProducts]);
 
   return (
     <form
@@ -198,7 +195,9 @@ const PlaceOrder = () => {
                 key={id}
                 onClick={() => setMethod(id)}
                 className={`flex items-center gap-3 border p-3 px-4 cursor-pointer rounded-lg hover:shadow-lg ${
-                  method === id ? `border-${color}-400 ring-2 ring-${color}-300` : ""
+                  method === id
+                    ? `border-${color}-400 ring-2 ring-${color}-300`
+                    : ""
                 }`}
               >
                 <div
@@ -208,10 +207,16 @@ const PlaceOrder = () => {
                 />
                 {image ? (
                   <div className="w-24 h-16 flex items-center justify-center border rounded-lg bg-white">
-                    <img className="h-10 w-auto object-contain" src={image} alt={id} />
+                    <img
+                      className="h-10 w-auto object-contain"
+                      src={image}
+                      alt={id}
+                    />
                   </div>
                 ) : (
-                  <p className="text-gray-500 text-sm font-medium mx-4">{label}</p>
+                  <p className="text-gray-500 text-sm font-medium mx-4">
+                    {label}
+                  </p>
                 )}
               </div>
             ))}
