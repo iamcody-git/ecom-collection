@@ -18,9 +18,15 @@ const Orders = () => {
         { headers: { token } }
       );
 
+      console.log("Response from userOrders API:", response.data); // Log the full response
+      console.log("Orders array:", response.data.orders); // Log the orders array
+
       if (response.data.success) {
         let allOrdersItem = [];
         response.data.orders.map((order) => {
+          console.log("Order:", order); // Log each order
+          console.log("Items in order:", order.items); // Log the items array in each order
+
           order.items.map((item) => {
             item["status"] = order.status;
             item["payment"] = order.payment;
@@ -30,8 +36,11 @@ const Orders = () => {
           });
         });
         setorderData(allOrdersItem.reverse());
+        console.log("All orders item:", allOrdersItem); // Log the final allOrdersItem array
       }
-    } catch (error) {}
+    } catch (error) {
+      console.error("Error loading order data:", error);
+    }
   };
 
   useEffect(() => {
@@ -53,25 +62,29 @@ const Orders = () => {
               <div>
                 <p className="sm:text-base font-medium">{item.name}</p>
                 <div className="flex items-center gap-3 mt-2 text-base text-gray-700">
-                  <p className="text-lg">
+                  <p>
                     {currency}
                     {item.price}
                   </p>
-                  <p>Qunatity:1</p>
-                  <p>Size: L</p>
+                  <p>Qunatity:{item.quantity}</p>
+                  <p>Size: {item.size}</p>
                 </div>
                 <p className="mt-2">
-                  Date:<span className="text-gray-400">23rd jan, 2025</span>
+                  Date:<span className="text-gray-400">{new Date(item.date).toDateString()}</span>
                 </p>
+                <p className="mt-2">
+                  Payment:<span className="text-gray-400">{item.paymentMethod}</span>
+                </p>
+                
               </div>
             </div>
             <div className="ms:w-1/2 flex justify-between">
               <div className="flex items-center gap-2">
                 <p className="min-w h-2 rounded-full bg-green-500"></p>
-                <p className="text-sm md:text-base">Ready to ship</p>
+                <p className="text-sm md:text-base">{item.status}</p>
               </div>
             </div>
-            <button className="border px-4 py-2 text-sm font-medium rounded-sm">
+            <button onClick={loadOrderData} className="border px-4 py-2 text-sm font-medium rounded-sm">
               Track Order
             </button>
           </div>

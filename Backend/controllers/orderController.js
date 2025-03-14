@@ -1,29 +1,30 @@
 import orderModel from "../models/orderModel.js";
 import userModel from "../models/userModel.js";
 
-
 // placing order using COD method
 export const placeOrder = async (req, res) => {
   try {
     const { userId, items, amount, address } = req.body;
     console.log("Received Order Data:", { userId, items, amount, address });
 
+    if (!items || items.length === 0) {
+      return res.json({ success: false, message: "No items in the order" });
+    }
+
     const orderData = {
       userId,
-      items,
+      items, // Ensure items are correctly passed
       amount,
       address,
       paymentMethod: "COD",
       payment: false,
+      status: "pending",
       date: Date.now(),
     };
 
-
-
-    // Save the order and return the saved order
     const newOrder = await orderModel.create(orderData);
+    console.log("Order created:", newOrder);
 
-    // Clear the user's cart after placing the order
     await userModel.findByIdAndUpdate(userId, { cartData: {} });
 
     res.json({ success: true, message: "Order placed", order: newOrder });
@@ -33,7 +34,6 @@ export const placeOrder = async (req, res) => {
   }
 };
 
-
 // placing order using khalti method
 export const placeOrderKhalti = async (req, res) => {};
 
@@ -41,7 +41,15 @@ export const placeOrderKhalti = async (req, res) => {};
 export const placeOrderEsewa = async (req, res) => {};
 
 // all order data for admin panel
-export const allOrder = async (req, res) => {};
+export const allOrder = async (req, res) => {
+  try {
+    const orders = await orderModel.find({});
+    res.json({ success: true, orders });
+  } catch (error) {
+    console.log(error);
+    res.json({ success: false, message: error.message });
+  }
+};
 
 // user order data for frontend
 export const userOrders = async (req, res) => {
@@ -50,13 +58,16 @@ export const userOrders = async (req, res) => {
 
     console.log("Fetching orders for userId:", userId); // Log the userId
 
-    // Fetch the latest orders for the user, sorted by date (most recent first)
     const orders = await orderModel.find({ userId }).sort({ date: -1 });
 
-    console.log("Orders found:", orders); // Log the orders found
+    console.log("Orders found:", orders); // Log the orders
 
     if (orders.length === 0) {
-      return res.json({ success: true, message: "No orders found", orders: [] });
+      return res.json({
+        success: true,
+        message: "No orders found",
+        orders: [],
+      });
     }
 
     res.json({ success: true, orders });

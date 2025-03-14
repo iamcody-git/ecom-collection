@@ -41,6 +41,7 @@ const PlaceOrder = () => {
     e.preventDefault();
     setLoading(true);
 
+    // Check if all required fields are filled
     if (Object.values(formData).some((field) => field.trim() === "")) {
       toast.error("Please fill in all required fields!");
       setLoading(false);
@@ -50,13 +51,20 @@ const PlaceOrder = () => {
     try {
       let orderItems = [];
 
+      // Log cartItem and products to verify their structure
+      console.log("Cart Items:", cartItem);
+      console.log("Products:", products);
+
+      // Loop through cartItem and create the orderItems array
       for (const items in cartItem) {
         for (const item in cartItem[items]) {
           if (cartItem[items][item]) {
             const iteminfo = structuredClone(
               products.find((product) => product._id === items)
             );
+
             if (iteminfo) {
+              // Add size and quantity to the item
               iteminfo.size = item;
               iteminfo.quantity = cartItem[items][item];
               orderItems.push(iteminfo);
@@ -65,6 +73,17 @@ const PlaceOrder = () => {
         }
       }
 
+      // Log the order items before sending them to the backend
+      console.log("Order Items:", orderItems);
+
+      // Check if there are any items to order
+      if (orderItems.length === 0) {
+        toast.error("No items in the order.");
+        setLoading(false);
+        return;
+      }
+
+      // Prepare order data
       let orderData = {
         address: formData,
         items: orderItems,
@@ -72,28 +91,19 @@ const PlaceOrder = () => {
         paymentMethod: method,
       };
 
-      switch (method) {
-        //api calls fro cod
-        case "cod":
-          const response = await axios.post(
-            backendUrl + "/api/order/place",
-            orderData,
-            { headers: { token } }
-          );
-          console.log(response.data);
-          
+      // Send order data to backend
+      const response = await axios.post(
+        backendUrl + "/api/order/place",
+        orderData,
+        { headers: { token } }
+      );
 
-          if (response.data.success) {
-            setCartItem({});
-            navigate("/orders");
-          } else {
-            toast.error(response.data.message);
-          }
-
-          break;
-
-        default:
-          break;
+      // Handle response from backend
+      if (response.data.success) {
+        setCartItem({});
+        navigate("/orders");
+      } else {
+        toast.error(response.data.message);
       }
     } catch (error) {
       console.error("Error processing order:", error);
@@ -102,7 +112,6 @@ const PlaceOrder = () => {
       setLoading(false);
     }
   };
-
 
   return (
     <form
