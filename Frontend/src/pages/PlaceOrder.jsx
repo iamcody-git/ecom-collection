@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from "react";
+import React, { useContext, useState } from "react";
 import Title from "../components/Title";
 import CartTotal from "../components/CartTotal";
 import esewa from "../assets/esewa.jpg";
@@ -14,12 +14,11 @@ const PlaceOrder = () => {
     navigate,
     backendUrl,
     token,
-    cartItem,
+    cartItems, // Ensure this matches the key used in ShopContext
     getCartAmount,
     delivery_fee,
     products,
     setCartItem,
-    setProducts,
   } = useContext(ShopContext);
 
   const [formData, setFormData] = useState({
@@ -52,22 +51,28 @@ const PlaceOrder = () => {
       let orderItems = [];
 
       // Log cartItem and products to verify their structure
-      console.log("Cart Items:", cartItem);
+      console.log("Cart Items:", cartItems); // Ensure this matches the key used in ShopContext
       console.log("Products:", products);
 
-      // Loop through cartItem and create the orderItems array
-      for (const items in cartItem) {
-        for (const item in cartItem[items]) {
-          if (cartItem[items][item]) {
-            const iteminfo = structuredClone(
-              products.find((product) => product._id === items)
-            );
+      // Ensure cartItems is defined and not empty
+      if (!cartItems || Object.keys(cartItems).length === 0) {
+        toast.error("No items in the cart.");
+        setLoading(false);
+        return;
+      }
 
-            if (iteminfo) {
-              // Add size and quantity to the item
-              iteminfo.size = item;
-              iteminfo.quantity = cartItem[items][item];
-              orderItems.push(iteminfo);
+      // Loop through cartItems and create the orderItems array
+      for (const itemId in cartItems) {
+        for (const size in cartItems[itemId]) {
+          if (cartItems[itemId][size]) {
+            const product = products.find((p) => p._id === itemId);
+            if (product) {
+              const itemInfo = {
+                ...product,
+                size,
+                quantity: cartItems[itemId][size],
+              };
+              orderItems.push(itemInfo);
             }
           }
         }
@@ -93,14 +98,15 @@ const PlaceOrder = () => {
 
       // Send order data to backend
       const response = await axios.post(
-        backendUrl + "/api/order/place",
+        `${backendUrl}/api/order/place`,
         orderData,
         { headers: { token } }
       );
 
       // Handle response from backend
       if (response.data.success) {
-        setCartItem({});
+        setCartItem({}); // Clear the cart
+        toast.success("Order placed successfully!");
         navigate("/orders");
       } else {
         toast.error(response.data.message);

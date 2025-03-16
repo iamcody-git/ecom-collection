@@ -50,7 +50,6 @@ const ShopContextProvider = (props) => {
     }
   };
 
-
   // 🛍️ Get total item count
   const getCartCount = () => {
     let totalCount = 0;
@@ -149,26 +148,32 @@ const ShopContextProvider = (props) => {
   };
 
   // 🛒 Fetch user cart
-  const getUserCart = async () => {
-    if (!token) return;
+const getUserCart = async () => {
+  if (!token) {
+    console.log("No token found. Cannot fetch user cart.");
+    return;
+  }
 
-    try {
-      const response = await axios.post(
-        `${backendUrl}/api/cart/get`,
-        {},
-        { headers: { token } }
-      );
+  try {
+    const response = await axios.post(
+      `${backendUrl}/api/cart/get`,
+      {},
+      { headers: { token } }
+    );
 
-      if (response.data.success) {
-        setCartItem(response.data.cartData || {});
-      } else {
-        toast.error("Failed to load cart.");
-      }
-    } catch (error) {
-      console.error("Error fetching user cart:", error);
-      toast.error("Could not fetch cart data.");
+    console.log("Cart API Response:", response.data); // Log the response
+
+    if (response.data.success) {
+      setCartItem(response.data.cartData || {}); // Ensure cartData is an object
+      console.log("Cart Item set in ShopContext:", response.data.cartData); // Log the updated cartItem
+    } else {
+      toast.error("Failed to load cart.");
     }
-  };
+  } catch (error) {
+    console.error("Error fetching user cart:", error);
+    toast.error("Could not fetch cart data.");
+  }
+};
 
   // 🔔 Sync token on load
   useEffect(() => {
@@ -184,7 +189,7 @@ const ShopContextProvider = (props) => {
     setSearch,
     showSearch,
     setShowSearch,
-    cartItems: cartItem,
+    cartItems: cartItem, // Ensure this matches the key used in the component
     addToCart,
     getCartCount,
     updateQuantity,
@@ -198,9 +203,7 @@ const ShopContextProvider = (props) => {
   };
 
   return (
-    <ShopContext.Provider value={value}>
-      {props.children}
-    </ShopContext.Provider>
+    <ShopContext.Provider value={value}>{props.children}</ShopContext.Provider>
   );
 };
 

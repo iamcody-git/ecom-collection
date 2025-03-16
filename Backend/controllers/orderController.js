@@ -13,7 +13,7 @@ export const placeOrder = async (req, res) => {
 
     const orderData = {
       userId,
-      items, // Ensure items are correctly passed
+      items, 
       amount,
       address,
       paymentMethod: "COD",
@@ -55,12 +55,10 @@ export const allOrder = async (req, res) => {
 export const userOrders = async (req, res) => {
   try {
     const { userId } = req.body;
-
-    console.log("Fetching orders for userId:", userId); // Log the userId
+    console.log("Fetching orders for userId:", userId);
 
     const orders = await orderModel.find({ userId }).sort({ date: -1 });
-
-    console.log("Orders found:", orders); // Log the orders
+    console.log("Orders found:", orders);
 
     if (orders.length === 0) {
       return res.json({
@@ -80,14 +78,12 @@ export const userOrders = async (req, res) => {
 // update order status from admin panel
 export const updateStatus = async (req, res) => {
   try {
-    const {orderId, status} = req.body;
-    await orderModel.findByIdAndUpdate(orderId, {status})
+    const { orderId, status } = req.body;
+    await orderModel.findByIdAndUpdate(orderId, { status });
 
-    res.json({success:true, message:'Status updated'})
+    res.json({ success: true, message: "Status updated" });
   } catch (error) {
     console.log(error);
     res.json({ success: false, message: error.message });
-
-    
   }
 };
