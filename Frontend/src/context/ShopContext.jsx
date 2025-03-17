@@ -161,11 +161,9 @@ const getUserCart = async () => {
       { headers: { token } }
     );
 
-    console.log("Cart API Response:", response.data); // Log the response
-
     if (response.data.success) {
-      setCartItem(response.data.cartData || {}); // Ensure cartData is an object
-      console.log("Cart Item set in ShopContext:", response.data.cartData); // Log the updated cartItem
+      setCartItem(response.data.cartData || {}); 
+      console.log("Cart Item set in ShopContext:", response.data.cartData); 
     } else {
       toast.error("Failed to load cart.");
     }
@@ -189,7 +187,7 @@ const getUserCart = async () => {
     setSearch,
     showSearch,
     setShowSearch,
-    cartItems: cartItem, // Ensure this matches the key used in the component
+    cartItems: cartItem, 
     addToCart,
     getCartCount,
     updateQuantity,
